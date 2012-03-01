@@ -137,9 +137,9 @@
 				<div class="slide-opt-left">
 					<ul>
 						<li>
-							<label for="total_posts">Total Posts</label>
+							<label for="total_posts">Total Videos</label>
 							<input type="text" name="ycs_total_posts" value="<?php echo $total_posts; ?>" size="9" />
-							<span>No of posts to show in a slider</span>
+							<span>Nº of videos from the channel</span>
 						</li>
 						<li>
 							<label for="pagination_style">Pagination Style</label>
@@ -185,7 +185,7 @@
 					<li>
 						<label for="posts_to_include">Channel name</label>
 						<input type="text" name="ycs_channel_name" value="<?php echo $channel_name; ?>" size="40" />
-						<span>http://www.youtube.com/channel_name</span>
+						<span>channel_name (without youtube URL)</span>
 					</li>
 					
 					<li>

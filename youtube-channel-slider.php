@@ -306,7 +306,7 @@ $output .= '<div id="rps">
 							if( !empty($post_details[$p]['post_first_img']) ){
 								$ycs_img_src_path = $post_details[$p]['post_first_img'];
 								if(!empty($ycs_img_src_path)){
-									$output .= '<a href="'.$post_details[$p]['post_permalink'].'"><center><img src="'.$ycs_img_src_path.'" /></center></a>';
+									$output .= '<a target="blank" href="'.$post_details[$p]['post_permalink'].'"><center><img src="'.$ycs_img_src_path.'" /></center></a>';
 								}
 							}
 							if($show_post_date){
@@ -318,7 +318,7 @@ $output .= '<div id="rps">
 							if( !empty($post_details[$p]['post_first_img']) || !empty($post_details[$p]['post_excerpt'])){
 								$ycs_img_src_path = $post_details[$p]['post_first_img'];
 								if(!empty($ycs_img_src_path)){
-									$output .= '<a href="'.$post_details[$p]['post_permalink'].'"><img src="'.$ycs_img_src_path.'" align="left" /></a>';
+									$output .= '<a target="blank" href="'.$post_details[$p]['post_permalink'].'"><img src="'.$ycs_img_src_path.'" align="left" /></a>';
 								}
 								$output .= $post_details[$p]['post_excerpt'];
 							}
