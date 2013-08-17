@@ -27,20 +27,17 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-define('YCS_VERSION', '0.1');
+define('YCS_VERSION', '1');
+define('YCS_URL', plugins_url('',__FILE__));
 
 //To perform action while activating pulgin i.e. creating the thumbnail of first image of  all posts
 register_activation_hook( __FILE__, 'ycs_activate' );
 
 //Create menu for configure page
 add_action('admin_menu', 'ycs_admin_actions');
-add_action('admin_print_styles', 'ycs_admin_style');
 
 //Add  the nedded styles & script
-add_action('wp_print_styles', 'ycs_add_style');
-add_action('wp_head', 'ycs_add_custom_style');
 add_action('init', 'ycs_add_script');
-
 add_shortcode('ycs', 'ycs_show');
 
 // register Rps widget
@@ -106,23 +103,20 @@ function ycs_admin() {
 	include('youtube-channel-slider-admin.php');
 }
 
-function ycs_admin_style() {	
-	wp_enqueue_style('rps-admin-style', WP_PLUGIN_URL.'/youtube-channel-slider/css/rps-admin-style.css');
-}
 
-/** Link the needed stylesheet */
-function ycs_add_style() {
-	wp_enqueue_style('rps-style', WP_PLUGIN_URL.'/youtube-channel-slider/css/style.css');
-}
-
-function ycs_add_custom_style() {
-	echo "<style type=\"text/css\" media=\"screen\">" . stripslashes(get_option('ycs_custom_css')) . "</style>";
-}
 
 /** Link the needed script */
 function ycs_add_script() {
 	if ( !is_admin() ){
 		wp_enqueue_script( 'jquery' );
+	        
+        wp_register_style('video-lightbox', YCS_URL.'/css/style.css');
+        wp_enqueue_style('video-lightbox');
+		wp_register_script('jquery.prettyphoto',YCS_URL.'/js/jquery.prettyPhoto.js', array('jquery'), '3.1.4');
+        wp_enqueue_script('jquery.prettyphoto');
+        wp_register_script('video-lightbox', YCS_URL.'/js/video-lightbox.js', array('jquery'), '3.1.4');
+        wp_enqueue_script('video-lightbox');
+        
 	}
 }
 
@@ -140,18 +134,8 @@ function ycs_show() {
 	$post_title_bg_color = get_option('ycs_post_title_bg_color');
 	$slider_speed = get_option('ycs_slider_speed');
 	$pagination_style = get_option('ycs_pagination_style');
-	$excerpt_words = get_option('ycs_excerpt_words');
-	$show_post_date = get_option('ycs_show_post_date');
-	$post_date_text = get_option('ycs_post_date_text');
-	$post_date_format = get_option('ycs_post_date_format');
+	$default_thumb = get_option('ycs_default_thumb');
 	
-	if(empty($post_date_text)){
-		$post_date_text = "Posted On:";
-	}
-	
-	if(empty($post_date_format)){
-		$post_date_format = "j-F-Y";
-	}
 	
 	if ( empty($slider_speed) ) {
 		$slider_speed = 7000;
@@ -167,8 +151,7 @@ function ycs_show() {
 	if ( !empty($post_title_bg_color) ){
 		$post_title_bg_color_js = "#".$post_title_bg_color;
 	}
-	$excerpt_length = '';
-	$excerpt_length = abs( (($width-40)/20) * (($height-55)/15) );
+	
 	
 	$user_name = $channel_name;  
 	$feed = new SimplePie();
@@ -178,6 +161,7 @@ function ycs_show() {
 	$success = $feed->init();
 	$feed->handle_content_type();
 	$YT_PlayerPage = "http://www.youtube.com/user/".$user_name."#play/uploads/";
+	$YT_Video = "http://www.youtube.com/watch?v=";
 	$i=0;
 	$post_details = NULL;
 	
@@ -194,15 +178,11 @@ function ycs_show() {
 		if ($enclosure = $item->get_enclosure()) {
 			$YT_VideoID = substr(strstr($item->get_permalink(), 'v='), 2, 11);
 			$post_details[$i]['post_title'] = $item->get_title();
-			$post_details[$i]['post_permalink'] = $YT_PlayerPage . $YT_VideoNumber . "/" . $YT_VideoID;
-			$post_details[$i]['post_first_img'] = $enclosure->get_thumbnail();
-			$post_details[$i]['post_excerpt'] =$item->get_description();
+			$post_details[$i]['post_permalink'] = $YT_Video . $YT_VideoID;			
+			$post_details[$i]['Video_ID'] =$YT_VideoID;
 		$i++;
 		if($YT_VideoNumber == $total_posts) break;
 		$YT_VideoNumber++;
-			#if ( $show_post_date ){
-			#	$post_details[$key]['post_date'] = date($post_date_format,strtotime($val->post_date));	
-			#}
 		}
 	}
 	
@@ -224,7 +204,7 @@ function ycs_show() {
 	$j(".col img").css({"width" : '.(($width/$post_per_slide)-15).'});
 	$j("#rps .col").css({"width" : '.(($width/$post_per_slide)-2).'});
 	$j("#rps .col").css({"height" : '.($height-4).'});
-	$j("#rps .col p.post-title span").css({"color" : "'.($post_title_color).'"});
+	$j(".YCS_titulo").css({"color" : "'.($post_title_color).'"});
 	$j("#rps .post-date").css({"top" : '.($height-20).'});
 	$j("#rps .post-date").css({"width" : '.(($width/$post_per_slide)-12).'});';
 	
@@ -294,42 +274,23 @@ $output .= '<div id="rps">
 		for ( $i = 1; $i <= $total_posts; $i+=$post_per_slide ) {
 			$output .= '<div class="slide">';
 					for ( $j = 1; $j <= $post_per_slide; $j++ ) {
-						$output .= '<div class="col"><p class="post-title"><a href="'.$post_details[$p]['post_permalink'].'"><span>'.$post_details[$p]['post_title'].'</span></a></p>';
-						if ( $slider_content == 2 ){
-							$output .= '<p class="slider-content">'.$post_details[$p]['post_excerpt'];
-							if($show_post_date){
-								$output .= '<div class="post-date">'.$post_date_text.' '.$post_details[$p]['post_date'].'</div>';
-							}
-							$output .= '</p></div>';
-						}elseif ( $slider_content == 1 ){
-							$output .= '<p class="slider-content-img">';
-							if( !empty($post_details[$p]['post_first_img']) ){
-								$ycs_img_src_path = $post_details[$p]['post_first_img'];
-								if(!empty($ycs_img_src_path)){
-									$output .= '<a target="blank" href="'.$post_details[$p]['post_permalink'].'"><center><img src="'.$ycs_img_src_path.'" /></center></a>';
-								}
-							}
-							if($show_post_date){
-								$output .= '<div class="post-date">'.$post_date_text.' '.$post_details[$p]['post_date'].'</div>';
-							}
-							$output .= '</p></div>';			
-						}elseif ( $slider_content == 3 ){
-							$output .= '<p class="slider-content-both">';
-							if( !empty($post_details[$p]['post_first_img']) || !empty($post_details[$p]['post_excerpt'])){
-								$ycs_img_src_path = $post_details[$p]['post_first_img'];
-								if(!empty($ycs_img_src_path)){
-									$output .= '<a target="blank" href="'.$post_details[$p]['post_permalink'].'"><img src="'.$ycs_img_src_path.'" align="left" /></a>';
-								}
-								$output .= $post_details[$p]['post_excerpt'];
-							}
-							if($show_post_date){
-								$output .= '<div class="post-date">'.$post_date_text.' '.$post_details[$p]['post_date'].'</div>';
-							}
-							$output .= '</p></div>';			
-						}
-						$p++;
-						if ( $p == $total_posts )
-							$p = 0;
+						    $atts= array(
+								'video_id' => $post_details[$p]['Video_ID'],
+								'width' => '600',	
+								'height' => '',
+								'anchor' => '',
+								'default_thumb' => $default_thumb,
+								'vid_type'=>'youtube'
+    						);
+							$anchor_replacement = wp_vid_lightbox_get_auto_thumb($atts);
+							$href_content = $post_details[$p]['post_permalink'].'&amp;width='. $atts['width'].'&amp;height='.$atts['height'];
+    						$outputLB = '<a rel="wp-video-lightbox" href="'.$href_content.'" title="">'.$anchor_replacement.'</a><p class="YCS_titulo">'.$post_details[$p]['post_title'].'</p>';
+
+							$output .= '<div class="col wpvl_auto_thumb_box_wrapper wpvl_auto_thumb_box"><div id="YCS_post-title" class="post-title">'.$outputLB.'</div></div>';					
+							
+							$p++;
+							if ( $p == $total_posts )
+								$p = 0;
 					}
 					$output .= '<div class="clr"></div>
 				</div>';
@@ -352,52 +313,38 @@ $output .= '<div id="rps">
 	return $output;
 }
 
-/** Create post excerpt manually
- * @param $post_content
- * @param $excerpt_length
- * @return post_excerpt or  void
-*/
-function create_excerpt( $post_content, $excerpt_length, $post_permalink, $excerpt_words=NULL){
-	$keep_excerpt_tags = get_option('ycs_keep_excerpt_tags');
-	
-	if(!$keep_excerpt_tags){
-		$post_excerpt = strip_shortcodes($post_content);
-		$post_excerpt = str_replace(']]>', ']]&gt;', $post_excerpt);
-		$post_excerpt = strip_tags($post_excerpt);
-	}else{
-		$post_excerpt = $post_content;
-	}
-	
-	$link_text = get_option('ycs_link_text');
-	if(!empty($link_text)){
-		$more_link = $link_text;
-	}else{
-		$more_link = "[more]";
-	}
-	if( !empty($excerpt_words) ){	
-		if ( !empty($post_excerpt) ) {
-			$words = explode(' ', $post_excerpt, $excerpt_words + 1 );	
-			array_pop($words);
-			array_push($words, ' <a href="'.$post_permalink.'">'.$more_link.'</a>');
-			$post_excerpt_rps = implode(' ', $words);
-			return $post_excerpt_rps;
-		} else {
-			return;
-		}
-	}else{
-		$post_excerpt_rps = substr( $post_excerpt, 0, $excerpt_length );
-		if ( !empty($post_excerpt_rps) ) {
-			if ( strlen($post_excerpt) > strlen($post_excerpt_rps) ){
-				$post_excerpt_rps =substr( $post_excerpt_rps, 0, strrpos($post_excerpt_rps,' '));
-			}	
-			$post_excerpt_rps .= ' <a href="'.$post_permalink.'">'.$more_link.'</a>';
-			return $post_excerpt_rps;
-		} else {
-			return;
-		}
-	}
-}
 
+function wp_vid_lightbox_get_auto_thumb($atts)
+{
+    $video_id = $atts['video_id'];
+	$default_thumb = $atts['default_thumb'];
+    //$pieces = explode("&", $video_id);
+    //$video_id = $pieces[0];
+
+    $anchor_replacement = "";
+    if($atts['vid_type']=="youtube")
+    {
+        //$anchor_replacement = '<div class="wpvl_auto_thumb_box_wrapper"><div class="wpvl_auto_thumb_box">';
+        $anchor_replacement .= '<img src="https://img.youtube.com/vi/'.$video_id.'/'.$default_thumb.'" class="video_lightbox_auto_anchor_image" alt="" />';
+        //$anchor_replacement .= '<div class="wpvl_auto_thumb_play"><img src="'.YCS_URL.'/images/play.png" class="wpvl_playbutton" /></div>';
+        //$anchor_replacement .= '</div></div>';
+    }
+    else if($atts['vid_type']=="vimeo")
+    {
+        $VideoInfo = wp_vid_lightbox_getVimeoInfo($video_id);
+        $thumb = $VideoInfo['thumbnail_medium'];
+        //print_r($VideoInfo);
+        $anchor_replacement = '<div class="wpvl_auto_thumb_box_wrapper"><div class="wpvl_auto_thumb_box">';
+        $anchor_replacement .= '<img src="'.$thumb.'" class="video_lightbox_auto_anchor_image" alt="" />';
+        $anchor_replacement .= '<div class="wpvl_auto_thumb_play"><img src="'.YCS_URL.'/images/play.png" class="wpvl_playbutton" /></div>';
+        $anchor_replacement .= '</div></div>';
+    }
+    else
+    {
+        wp_die("<p>no video type specified</p>");
+    }
+    return $anchor_replacement; 
+}
 /**
  * RpsWidget Class
  */

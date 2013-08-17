@@ -1,10 +1,12 @@
 === Youtube Channel Slider ===
 Contributors: Shafie	
 Donate link: http://www.kesweh.com/donate/
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl.html
 Tags: posts, youtube, channel, youtube channel, scroll, slider
-Requires at least: 2.9.1
-Tested up to: 3.2.1
-Stable tag: 0.1
+Requires at least: 3.3
+Tested up to: 3.6
+Stable tag: 1
 
 Youtube Channel Slider displays your youtube channel using slider (show thumbs).
 
@@ -50,6 +52,19 @@ Contact me at http://www.kesweh.com/contacto/
 1. Configuration page
 
 == Changelog ==
+= v1.0 =
+* Bugfixes
+	* Point to video instead of channel in every thumb.
+* New feautres
+	* Added lightbox to open the video in the same site instead youtube
+	* Added select which thumbnail to show
+* Enhancements
+	* Deleted custom CSS (use instead jetpack custom css)
+	* Deleted all options about excerpts (no sense)
 
 = v0.1 =
 * Initial release version.
+
+== Support ==
+
+For support, please visit: http://www.kesweh.com/youtube-channel-slider/
