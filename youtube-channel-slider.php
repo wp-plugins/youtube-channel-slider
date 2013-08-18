@@ -6,7 +6,7 @@
 Plugin Name: Youtube Channel Slider
 Plugin URI: http://www.kesweh.com/wordpress-plugins/
 Description: Show slider with thumbs extracted from Youtube Channel
-Version: 0.1
+Version: 1.1
 Author: Shafie Abla
 Author URI: http://www.kesweh.com/
 License: GPLv2 or later
@@ -136,7 +136,9 @@ function ycs_show() {
 	$pagination_style = get_option('ycs_pagination_style');
 	$default_thumb = get_option('ycs_default_thumb');
 	
-	
+	if ( empty($default_thumb) ){
+		$default_thumb = "0.jpg";
+	}
 	if ( empty($slider_speed) ) {
 		$slider_speed = 7000;
 	}else{
