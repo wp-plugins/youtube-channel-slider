@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl.html
 Tags: posts, youtube, channel, youtube channel, scroll, slider
 Requires at least: 3.3
 Tested up to: 3.6
-Stable tag: 1.1
+Stable tag: 1.2
 
 Youtube Channel Slider displays your youtube channel using slider (show thumbs).
 
@@ -52,10 +52,15 @@ Contact me at http://www.kesweh.com/contacto/
 1. Configuration page
 
 == Changelog ==
+= v1.2 =
+* New feautre
+	* Select the use of Lightbox (Yes/No)
+
 = v1.1 =
 * Bugfixes
 	* Tagging real version of the plugin
 	* Set "default thumbnail" to 0.jpg
+
 = v1.0 =
 * Bugfixes
 	* Point to video instead of channel in every thumb.

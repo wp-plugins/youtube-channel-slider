@@ -45,6 +45,9 @@
 
 		$default_thumb = $_POST['ycs_default_thumb'];
 		update_option('ycs_default_thumb', $default_thumb);
+
+		$lightbox = $_POST['ycs_lightbox'];
+		update_option('ycs_lightbox', $lightbox);
 				
 ?>		
 		<?php if( empty($error) ){ ?>
@@ -73,7 +76,7 @@
 		$post_date_text = get_option('ycs_post_date_text');
 		$post_date_format = get_option('ycs_post_date_format');
 		$default_thumb = get_option('ycs_default_thumb');
-		
+		$lightbox = get_option('ycs_lightbox');
 		
 	}
 ?>
@@ -139,6 +142,13 @@
 							<label for="default_thumb">Default Thumbnail</label>
 							<input type="text" name="ycs_default_thumb" value="<?php echo $default_thumb; ?>" size="9" />
 							<span>ex : mqdefault.jpg (default 0.jpg)</span>
+						</li>
+						<li>
+							<label for="lightbox">Use Lightbox</label>
+							<select name="ycs_lightbox">
+								<option value="1" <?php if($lightbox==1){echo 'selected';} ?>>Yes</option>
+								<option value="2" <?php if($lightbox==2){echo 'selected';} ?>>No</option>
+							</select>
 						</li>
 					</ul>
 				</div>

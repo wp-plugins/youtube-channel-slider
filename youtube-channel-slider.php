@@ -6,7 +6,7 @@
 Plugin Name: Youtube Channel Slider
 Plugin URI: http://www.kesweh.com/wordpress-plugins/
 Description: Show slider with thumbs extracted from Youtube Channel
-Version: 1.1
+Version: 1.2
 Author: Shafie Abla
 Author URI: http://www.kesweh.com/
 License: GPLv2 or later
@@ -135,7 +135,8 @@ function ycs_show() {
 	$slider_speed = get_option('ycs_slider_speed');
 	$pagination_style = get_option('ycs_pagination_style');
 	$default_thumb = get_option('ycs_default_thumb');
-	
+	$lightbox = get_option('ycs_lightbox');
+
 	if ( empty($default_thumb) ){
 		$default_thumb = "0.jpg";
 	}
@@ -286,7 +287,12 @@ $output .= '<div id="rps">
     						);
 							$anchor_replacement = wp_vid_lightbox_get_auto_thumb($atts);
 							$href_content = $post_details[$p]['post_permalink'].'&amp;width='. $atts['width'].'&amp;height='.$atts['height'];
-    						$outputLB = '<a rel="wp-video-lightbox" href="'.$href_content.'" title="">'.$anchor_replacement.'</a><p class="YCS_titulo">'.$post_details[$p]['post_title'].'</p>';
+							if ($lightbox==1) {
+								$rel="rel='wp-video-lightbox'";
+							} else {
+								$rel="target='_blank'";
+							}
+    						$outputLB = '<a '.$rel.' href="'.$href_content.'" title="">'.$anchor_replacement.'</a><p class="YCS_titulo">'.$post_details[$p]['post_title'].'</p>';
 
 							$output .= '<div class="col wpvl_auto_thumb_box_wrapper wpvl_auto_thumb_box"><div id="YCS_post-title" class="post-title">'.$outputLB.'</div></div>';					
 							
