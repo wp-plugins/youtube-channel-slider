@@ -158,7 +158,7 @@ function ycs_show() {
 	
 	$user_name = $channel_name;  
 	$feed = new SimplePie();
-	$feed->set_feed_url("http://gdata.youtube.com/feeds/api/users/".$user_name."/uploads");
+	$feed->set_feed_url("http://www.youtube.com/feeds/videos.xml?user=".$user_name);
 	$feed->enable_cache(false); //  disable caching
 	$feed->set_timeout(5);
 	$success = $feed->init();
